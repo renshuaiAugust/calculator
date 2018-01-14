@@ -1,0 +1,143 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>计算器—Roger</title>
+    <link rel="stylesheet" type="text/css" href="day.css"/>
+</head>
+<body>
+<div id="outer">
+    <div id="night"><input type="checkbox" id="night_switch" /><label for='night_switch'></label></div><span style="position: absolute;right: -10px;top: 60px;">@Roger</span>
+    <div id="view_area">
+        <input id="store_area" />
+        <input id="curr_area" />
+    </div>
+    <div id="ctrl_area">
+        <ul class='clearfix'>
+            <li class="style1 wipe">C</li>
+            <li class="style1">%</li>
+            <li class="style1">÷</li>
+            <li class="style1">×</li>
+            <li>7</li>
+            <li>8</li>
+            <li>9</li>
+            <li class="style1">－</li>
+            <li>4</li>
+            <li>5</li>
+            <li>6</li>
+            <li class="style1">+</li>
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+            <li class="style2">=</li>
+            <li>0</li>
+            <li>.</li>
+            <li class="backspace" id="back"></li>
+        </ul>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var oCtrl = document.getElementById('ctrl_area');
+    var store = document.getElementById('store_area')
+    var curr  = document.getElementById('curr_area');
+    var back  = document.getElementById('back');
+    var btn   = oCtrl.getElementsByTagName('li');
+    var oInput=document.getElementById('view_area').getElementsByTagName('input');
+    var flag=false;
+
+    for(var i = 0;i<oInput.length;i++){
+        oInput[i].onfocus=function(){
+            this.blur();
+        }
+    }
+
+    for (var i=0;i<btn.length;i++) {
+        btn[i].onclick=function(){
+            var num;
+            var str='0';
+            switch (this.innerHTML){
+                case '+': count('+');
+                    break;
+
+                case '-': count('-');
+                    break;
+
+                case '×': count('*');
+                    break;
+
+                case '÷': count('/');
+                    break;
+
+                case '%': count('%');
+                    break;
+
+                case '=': if(flag==false){store.value+=curr.value}
+                    curr.value = eval(store.value.replace(/\%\/\*\-\+/,''));
+                    curr.value.length < 10 &&(curr.value = curr.value.substr(0,10).replace("NaN",0));
+                    flag=true;
+                    break;
+
+                case 'C': store.value='';curr.value='0';
+                    break;
+
+                default:
+                    if(flag==true){
+                        curr.value = 0;store.value = "";flag = false;
+                    }
+                    curr.value = (curr.value + this.innerHTML).replace(/^[0\%\/\*\-\+](\d)/,"$1");
+                    break;
+            }
+        }
+    }
+    back.onclick=function(){
+        curr.value=curr.value.substr(0,curr.value.length-1)
+    }
+    function count(symbol){
+        if(flag==true){
+            store.value=curr.value+symbol;
+            curr.value=symbol;
+            flag=false;
+        }else{
+            if(/[\%\/\*\-\+]$/.test(curr.value)==false) {
+                store.value += curr.value;
+            }
+            curr.value = symbol;
+        }
+        if(/[\%\/\*\-\+]$/.test(store.value)==false){
+            store.value += curr.value;
+        }
+        store.value = store.value.slice(-1) != symbol ? store.value.replace(/.$/,symbol):store.value;
+    }
+
+    var oNight=document.getElementById('night_switch');
+    var oLink=document.getElementsByTagName('link')[0];
+    oNight.onclick=function(){
+        if(oNight.checked){
+            oLink.href='night.css';
+        }else{
+            oLink.href='day.css';
+        }
+    }
+
+    var timer=setTimeout(function(){
+
+        var now=new Date();
+        var hour=now.getHours();
+        if(hour>19){
+            var yes=confirm('晚上了,是否开启夜间模式?')
+            if(yes){
+                oNight.checked='checked';
+                oLink.href='night.css';
+                setTimeout(function(){},1000)
+            }
+
+        }
+
+    },1000)
+
+
+</script>
+</body>
+</html>
